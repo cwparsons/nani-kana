@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import { MONOGRAPHS } from "../configuration";
+import { MONOGRAPHS } from "../constants";
 import { recordAnswer } from "../analytics";
+import { useGameStore } from "../use-game-store";
+
+const gameStore = useGameStore();
 
 const props = defineProps<{
-  questionNumber: number;
   onAfterAnswer?: () => void;
-  onNextQuestion: () => void;
+  onNextQuestion?: () => void;
 }>();
 
 const hasAnswered = ref(false);
@@ -22,7 +24,7 @@ function onAnswer(answer: string) {
 
   if (correct) {
     window.navigator?.vibrate?.(200);
-    
+
     newQuestion();
   }
 
@@ -32,8 +34,6 @@ function onAnswer(answer: string) {
 }
 
 function createQuestion() {
-  const NUMBER_OF_ANSWERS = 8;
-
   // Pick random character
   const randomCharacterIndex = Math.floor(
     Math.random() * Object.keys(MONOGRAPHS).length
@@ -46,10 +46,10 @@ function createQuestion() {
     .filter((v) => v !== romanji)
     .sort(() => 0.5 - Math.random());
 
-  const answers = [...shuffled.slice(0, NUMBER_OF_ANSWERS)];
+  const answers = [...shuffled.slice(0, gameStore.numberOfAnswers)];
 
   // Random insert real answer into randomized answers
-  const randomAnswerIndex = Math.floor(Math.random() * NUMBER_OF_ANSWERS);
+  const randomAnswerIndex = Math.floor(Math.random() * gameStore.numberOfAnswers);
   answers[randomAnswerIndex] = MONOGRAPHS[kana];
 
   answers.sort((a, b) => {
@@ -65,15 +65,17 @@ function createQuestion() {
 async function newQuestion() {
   question.value = createQuestion();
   hasAnswered.value = false;
+
+  if (props.onNextQuestion) {
+    props.onNextQuestion();
+  }
 }
 </script>
 
 <template>
   <div class="flex flex-col gap-y-8">
     <div>
-      <div class="flex">
-
-      </div>
+      <div class="flex"></div>
       <div class="border border-solid border-neutral-500 p-8 rounded">
         <h2 class="text-9xl">{{ question.kana }}</h2>
       </div>

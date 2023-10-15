@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import PromptUpdate from "./PromptUpdate.vue";
+import { useGameStore } from "../use-game-store";
 
-defineProps<{
-  onGameStart: () => void;
-}>();
+const gameStore = useGameStore();
 </script>
 
 <template>
@@ -16,8 +14,10 @@ defineProps<{
       </ruby>
     </h1>
 
-    <div class="flex justify-center gap-x-8">
-      <button class="space-y-4" @click="onGameStart">Start</button>
+    <div class="flex flex-col justify-center gap-y-4">
+      <button @click="() => gameStore.screen = 'Question'">Start</button>
+      <button @click="() => gameStore.screen = 'Options'">Options</button>
+      <button @click="() => gameStore.screen = 'Statistics'">Statistics</button>
     </div>
 
     <div class="flex justify-center gap-x-8">

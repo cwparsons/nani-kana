@@ -5,9 +5,13 @@ import Question from "./Question.vue";
 import Splash from "./Splash.vue";
 import Statistics from "./Statistics.vue";
 
-import { useGameStore } from "../use-game-store";
+import { GAME_STORE_KEY, useGameStore } from "../use-game-store";
 
 const gameStore = useGameStore();
+
+gameStore.$subscribe((_mutation, state) => {
+  localStorage.setItem(GAME_STORE_KEY, JSON.stringify(state));
+});
 </script>
 
 <template>

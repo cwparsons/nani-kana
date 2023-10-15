@@ -35,9 +35,21 @@ function onAnswer(answer: string) {
 
 function createQuestion() {
   // Pick random character
-  const randomCharacterIndex = Math.floor(
+  let randomCharacterIndex: number = Math.floor(
     Math.random() * Object.keys(MONOGRAPHS).length
   );
+
+  // If it was the last question, pick another random index.
+  try {
+    while (
+      question.value.kana === Object.keys(MONOGRAPHS)[randomCharacterIndex]
+    ) {
+      randomCharacterIndex = Math.floor(
+        Math.random() * Object.keys(MONOGRAPHS).length
+      );
+    }
+  } catch (e) {}
+
   const kana = Object.keys(MONOGRAPHS)[randomCharacterIndex];
   const romanji = MONOGRAPHS[kana];
 
@@ -49,7 +61,9 @@ function createQuestion() {
   const answers = [...shuffled.slice(0, gameStore.numberOfAnswers)];
 
   // Random insert real answer into randomized answers
-  const randomAnswerIndex = Math.floor(Math.random() * gameStore.numberOfAnswers);
+  const randomAnswerIndex = Math.floor(
+    Math.random() * gameStore.numberOfAnswers
+  );
   answers[randomAnswerIndex] = MONOGRAPHS[kana];
 
   answers.sort((a, b) => {

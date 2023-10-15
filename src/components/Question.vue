@@ -2,6 +2,7 @@
 import { ref } from "vue";
 
 import { MONOGRAPHS } from "../configuration";
+import { recordAnswer } from "../analytics";
 
 const props = defineProps<{
   questionNumber: number;
@@ -12,8 +13,18 @@ const props = defineProps<{
 const hasAnswered = ref(false);
 const question = ref(createQuestion());
 
-function onAnswer() {
+function onAnswer(answer: string) {
   hasAnswered.value = true;
+
+  const correct = answer === MONOGRAPHS[question.value.kana];
+
+  recordAnswer(question.value.kana, correct);
+
+  if (correct) {
+    window.navigator?.vibrate?.(200);
+    
+    newQuestion();
+  }
 
   if (props.onAfterAnswer) {
     props.onAfterAnswer();
@@ -60,6 +71,9 @@ async function newQuestion() {
 <template>
   <div class="flex flex-col gap-y-8">
     <div>
+      <div class="flex">
+
+      </div>
       <div class="border border-solid border-neutral-500 p-8 rounded">
         <h2 class="text-9xl">{{ question.kana }}</h2>
       </div>
@@ -72,8 +86,8 @@ async function newQuestion() {
           'bg-rose-950': hasAnswered && answer !== MONOGRAPHS[question.kana],
         }"
         :disabled="hasAnswered"
-        :key="answer"
-        @click="onAnswer"
+        :key="`${question.kana}-${answer}`"
+        @click="() => onAnswer(answer)"
         v-for="answer in question.answers"
       >
         {{ answer }}

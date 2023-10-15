@@ -34,11 +34,19 @@ function createQuestion() {
   const shuffled = Object.values(MONOGRAPHS)
     .filter((v) => v !== romanji)
     .sort(() => 0.5 - Math.random());
-  const answers = [...shuffled.slice(0, NUMBER_OF_ANSWERS)].sort();
+
+  const answers = [...shuffled.slice(0, NUMBER_OF_ANSWERS)];
 
   // Random insert real answer into randomized answers
   const randomAnswerIndex = Math.floor(Math.random() * NUMBER_OF_ANSWERS);
   answers[randomAnswerIndex] = MONOGRAPHS[kana];
+
+  answers.sort((a, b) => {
+    const indexA = Object.values(MONOGRAPHS).findIndex((v) => v === a);
+    const indexB = Object.values(MONOGRAPHS).findIndex((v) => v === b);
+
+    return indexA < indexB ? -1 : 1;
+  });
 
   return { kana, answers };
 }
@@ -74,7 +82,7 @@ async function newQuestion() {
 
     <div
       :aria-hidden="!hasAnswered"
-      class="flex place-items-center opacity-0"
+      class="flex justify-center opacity-0"
       :class="{ 'opacity-100': hasAnswered }"
     >
       <button class="flex items-center gap-x-2" @click="newQuestion">

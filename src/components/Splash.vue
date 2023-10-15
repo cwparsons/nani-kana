@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import PromptUpdate from "./PromptUpdate.vue";
+
 defineProps<{
   onGameStart: () => void;
 }>();
@@ -16,6 +18,10 @@ defineProps<{
     <div class="flex justify-center gap-x-8">
       <button class="space-y-4" @click="onGameStart">Start</button>
       <!-- <button class="space-y-4">Analytics</button> -->
+    </div>
+
+    <div class="flex justify-center gap-x-8">
+      <PromptUpdate />
     </div>
   </div>
 </template>

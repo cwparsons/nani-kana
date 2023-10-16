@@ -24,7 +24,9 @@ export function recordAnswer(kana: string, correct: boolean) {
 }
 
 export function getStatistics(): Statistics {
-  return JSON.parse(window.localStorage.getItem(KEY) ?? JSON.stringify(emptyStatistics()));
+  return JSON.parse(
+    window.localStorage.getItem(KEY) ?? JSON.stringify(emptyStatistics())
+  );
 }
 
 function setStatistics(statistics: Statistics) {
@@ -35,8 +37,10 @@ function setStatistics(statistics: Statistics) {
 
 function emptyStatistics() {
   const statistics: Statistics = {};
-  
-  Object.keys(MONOGRAPHS).forEach((monograph) => statistics[monograph] = { visible: 0, correct: 0 });
+
+  Object.keys(MONOGRAPHS).forEach(
+    (monograph) => (statistics[monograph] = { visible: 0, correct: 0 })
+  );
 
   return statistics;
 }

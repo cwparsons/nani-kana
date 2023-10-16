@@ -5,7 +5,7 @@ import Question from "./Question.vue";
 import Splash from "./Splash.vue";
 import Statistics from "./Statistics.vue";
 
-import { GAME_STORE_KEY, useGameStore } from "../use-game-store";
+import { GAME_STORE_KEY, useGameStore } from "../store/use-game-store";
 
 const gameStore = useGameStore();
 

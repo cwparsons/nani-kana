@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import { MONOGRAPHS } from "../constants";
-import { recordAnswer } from "../analytics";
-import { useGameStore } from "../use-game-store";
+import { useGameStore } from "../store/use-game-store";
+import { MONOGRAPHS } from "../utilities/constants";
+import { recordAnswer } from "../utilities/analytics";
 
 const gameStore = useGameStore();
 
@@ -135,3 +135,4 @@ async function newQuestion() {
     </div>
   </div>
 </template>
+../utilities/analytics../utilities/constants

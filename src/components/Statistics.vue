@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getStatistics } from "../analytics";
+import { getStatistics } from "../utilities/analytics";
 
 const statistics = getStatistics();
 </script>
@@ -16,3 +16,4 @@ const statistics = getStatistics();
     </ul>
   </div>
 </template>
+../utilities/analytics

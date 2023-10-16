@@ -90,13 +90,14 @@ async function newQuestion() {
   <div class="flex flex-col gap-y-8">
     <div>
       <div class="flex"></div>
-      <div class="border border-solid border-neutral-500 p-8 rounded">
+      <div class="border border-solid border-neutral-500 p-8 rounded-lg">
         <h2 class="text-9xl">{{ question.kana }}</h2>
       </div>
     </div>
 
     <div class="grid grid-cols-2 gap-4">
       <button
+        class="rounded-lg"
         :class="{
           'bg-lime-900': hasAnswered && answer === MONOGRAPHS[question.kana],
           'bg-rose-950': hasAnswered && answer !== MONOGRAPHS[question.kana],
@@ -115,7 +116,7 @@ async function newQuestion() {
       class="flex justify-center opacity-0"
       :class="{ 'opacity-100': hasAnswered }"
     >
-      <button class="flex items-center gap-x-2" @click="newQuestion">
+      <button class="flex rounded-lg items-center gap-x-2" @click="newQuestion" :disabled="!hasAnswered">
         Next
         <svg
           xmlns="http://www.w3.org/2000/svg"

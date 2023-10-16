@@ -5,15 +5,12 @@ const statistics = getStatistics();
 </script>
 
 <template>
-  <div>
-    <h1>Statistics</h1>
-
-    <ul>
-      <li v-for="(value, key) in statistics">
-        <b>{{ key }}</b
-        >: {{ value.correct }} / {{ value.visible }}
-      </li>
-    </ul>
-  </div>
+  <ul class="grid grid-cols-5 gap-3 text-center">
+    <li v-for="(value, key) in statistics">
+      <div class="border p-1">
+        <div>{{ key }}</div>
+        <div :class="{ 'opacity-0': value.visible === 0 }">{{ Math.floor(value.correct / value.visible * 100) }}%</div>
+      </div>
+    </li>
+  </ul>
 </template>
-../utilities/analytics

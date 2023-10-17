@@ -7,7 +7,7 @@ const gameStore = useGameStore();
 <template>
   <header class="flex align-center items-center p-4 w-full">
     <div class="basis-1/3">
-      <a @click="() => (gameStore.screen = 'Splash')">
+      <a class="cursor-pointer" @click="() => (gameStore.screen = 'Splash')">
         <img alt="Nani?" class="w-10" src="/assets/images/logo.svg" />
       </a>
     </div>

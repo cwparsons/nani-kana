@@ -5,6 +5,7 @@ type GameScreens = "Splash" | "Question" | "Options" | "Statistics";
 type GameStore = {
   screen: GameScreens;
   numberOfAnswers: number;
+  questionSelection: "random" | "least-correct";
 };
 
 export const GAME_STORE_KEY = "gamestore";
@@ -16,6 +17,7 @@ const previousStore: GameStore = JSON.parse(
 const getDefaultStore: () => GameStore = () => ({
   screen: "Splash" as GameScreens,
   numberOfAnswers: 8,
+  questionSelection: "random",
 });
 
 export const useGameStore = defineStore("game", {

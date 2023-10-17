@@ -44,3 +44,7 @@ function emptyStatistics() {
 
   return statistics;
 }
+
+export function resetStatistics() {
+  setStatistics(emptyStatistics());
+}

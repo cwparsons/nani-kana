@@ -3,7 +3,7 @@ import { ref } from "vue";
 
 import { useGameStore } from "../store/use-game-store";
 import { MONOGRAPHS } from "../utilities/constants";
-import { recordAnswer } from "../utilities/analytics";
+import { getStatistics, recordAnswer } from "../utilities/analytics";
 
 const gameStore = useGameStore();
 
@@ -33,20 +33,44 @@ function onAnswer(answer: string) {
   }
 }
 
+function pickRandomCharacter() {
+  // Choose incorrect answers more often than normally correct answers.
+  if (gameStore.questionSelection === "least-correct") {
+    const statistics = getStatistics();
+    const options: number[] = [];
+
+    for (const statistic in statistics) {
+      const items = statistics[statistic].visible - statistics[statistic].correct + 1;
+      const index = Object.keys(MONOGRAPHS).indexOf(statistic);
+
+      for (let i = 0; i < items; i++) {
+        options.push(index);
+      }
+    }
+
+    const randomOptionIndex = Math.floor(Math.random() * options.length);
+
+    return options[randomOptionIndex];
+  }
+
+  // Otherwise randomly choose a character
+  // if (gameStore.questionSelection === "random")
+  return Math.floor(Math.random() * Object.keys(MONOGRAPHS).length);
+}
+
 function createQuestion() {
-  // Pick random character
-  let randomCharacterIndex: number = Math.floor(
-    Math.random() * Object.keys(MONOGRAPHS).length
-  );
+  let randomCharacterIndex = pickRandomCharacter();
 
   // If it was the last question, pick another random index.
   try {
-    while (
-      question.value.kana === Object.keys(MONOGRAPHS)[randomCharacterIndex]
+    // Use for loop to prevent infinite loop
+    for (
+      let i = 0;
+      i < 1e3 &&
+      question.value.kana === Object.keys(MONOGRAPHS)[randomCharacterIndex];
+      i++
     ) {
-      randomCharacterIndex = Math.floor(
-        Math.random() * Object.keys(MONOGRAPHS).length
-      );
+      randomCharacterIndex = pickRandomCharacter();
     }
   } catch (e) {}
 
@@ -116,7 +140,11 @@ async function newQuestion() {
       class="flex justify-center opacity-0"
       :class="{ 'opacity-100': hasAnswered }"
     >
-      <button class="flex rounded-lg items-center gap-x-2" @click="newQuestion" :disabled="!hasAnswered">
+      <button
+        class="flex rounded-lg items-center gap-x-2"
+        @click="newQuestion"
+        :disabled="!hasAnswered"
+      >
         Next
         <svg
           xmlns="http://www.w3.org/2000/svg"

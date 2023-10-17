@@ -29,6 +29,10 @@ export function getStatistics(): Statistics {
   );
 }
 
+export function resetStatistics() {
+  setStatistics(emptyStatistics());
+}
+
 function setStatistics(statistics: Statistics) {
   const stringifiedStatistics = JSON.stringify(statistics);
 
@@ -43,8 +47,4 @@ function emptyStatistics() {
   );
 
   return statistics;
-}
-
-export function resetStatistics() {
-  setStatistics(emptyStatistics());
 }

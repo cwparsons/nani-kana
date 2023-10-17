@@ -16,9 +16,10 @@ const gameStore = useGameStore();
       </label>
       <input
         class="h-10 w-14 border p-2 text-center"
-        type="number"
-        name="number-of-answers"
         id="number-of-answers"
+        max="12"
+        name="number-of-answers"
+        type="number"
         v-model.number="gameStore.numberOfAnswers"
       />
     </div>
@@ -32,7 +33,7 @@ const gameStore = useGameStore();
       </label>
       <select class="border p-2" id="question-selection" v-model="gameStore.questionSelection">
         <option value="random">Random</option>
-        <option value="least-correct">Least-correct</option>
+        <option value="least-correct">Incorrect more often</option>
       </select>
     </div>
 

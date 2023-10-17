@@ -1,112 +1,29 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import { useGameStore } from "../store/use-game-store";
-import { MONOGRAPHS } from "../utilities/constants";
-import { getStatistics, recordAnswer } from "../utilities/analytics";
-
-const gameStore = useGameStore();
-
-const props = defineProps<{
-  onAfterAnswer?: () => void;
-  onNextQuestion?: () => void;
-}>();
+import { recordAnswer } from "../utilities/analytics";
+import { getQuestion } from "../utilities/get-question";
 
 const hasAnswered = ref(false);
-const question = ref(createQuestion());
+const question = ref(getQuestion());
 
 function onAnswer(answer: string) {
   hasAnswered.value = true;
 
-  const correct = answer === MONOGRAPHS[question.value.kana];
+  const correct = answer === question.value.answer;
 
-  recordAnswer(question.value.kana, correct);
+  recordAnswer(question.value.answer, correct);
 
   if (correct) {
     window.navigator?.vibrate?.(200);
 
     newQuestion();
   }
-
-  if (props.onAfterAnswer) {
-    props.onAfterAnswer();
-  }
-}
-
-function pickRandomCharacter() {
-  // Choose incorrect answers more often than normally correct answers.
-  if (gameStore.questionSelection === "least-correct") {
-    const statistics = getStatistics();
-    const options: number[] = [];
-
-    for (const statistic in statistics) {
-      const items = statistics[statistic].visible - statistics[statistic].correct + 1;
-      const index = Object.keys(MONOGRAPHS).indexOf(statistic);
-
-      for (let i = 0; i < items; i++) {
-        options.push(index);
-      }
-    }
-
-    const randomOptionIndex = Math.floor(Math.random() * options.length);
-
-    return options[randomOptionIndex];
-  }
-
-  // Otherwise randomly choose a character
-  // if (gameStore.questionSelection === "random")
-  return Math.floor(Math.random() * Object.keys(MONOGRAPHS).length);
-}
-
-function createQuestion() {
-  let randomCharacterIndex = pickRandomCharacter();
-
-  // If it was the last question, pick another random index.
-  try {
-    // Use for loop to prevent infinite loop
-    for (
-      let i = 0;
-      i < 1e3 &&
-      question.value.kana === Object.keys(MONOGRAPHS)[randomCharacterIndex];
-      i++
-    ) {
-      randomCharacterIndex = pickRandomCharacter();
-    }
-  } catch (e) {}
-
-  const kana = Object.keys(MONOGRAPHS)[randomCharacterIndex];
-  const romanji = MONOGRAPHS[kana];
-
-  // Pick random answers that aren't the real answer
-  const shuffled = Object.values(MONOGRAPHS)
-    .filter((v) => v !== romanji)
-    .sort(() => 0.5 - Math.random());
-
-  const answers = [...shuffled.slice(0, gameStore.numberOfAnswers)];
-
-  // Random insert real answer into randomized answers
-  const randomAnswerIndex = Math.floor(
-    Math.random() * gameStore.numberOfAnswers
-  );
-  answers[randomAnswerIndex] = MONOGRAPHS[kana];
-
-  answers.sort((a, b) => {
-    const indexA = Object.values(MONOGRAPHS).findIndex((v) => v === a);
-    const indexB = Object.values(MONOGRAPHS).findIndex((v) => v === b);
-
-    return indexA < indexB ? -1 : 1;
-  });
-
-  return { kana, answers };
 }
 
 async function newQuestion() {
-  question.value = createQuestion();
+  question.value = getQuestion();
   hasAnswered.value = false;
-
-  if (props.onNextQuestion) {
-    props.onNextQuestion();
-  }
 }
 </script>
 
@@ -115,7 +32,7 @@ async function newQuestion() {
     <div>
       <div class="flex"></div>
       <div class="border border-solid border-neutral-500 p-8 rounded-lg">
-        <h2 class="text-9xl">{{ question.kana }}</h2>
+        <h2 class="text-9xl">{{ question.character }}</h2>
       </div>
     </div>
 
@@ -123,11 +40,11 @@ async function newQuestion() {
       <button
         class="rounded-lg"
         :class="{
-          'bg-lime-900': hasAnswered && answer === MONOGRAPHS[question.kana],
-          'bg-rose-950': hasAnswered && answer !== MONOGRAPHS[question.kana],
+          'bg-lime-900': hasAnswered && answer === question.answer,
+          'bg-rose-950': hasAnswered && answer !== question.answer,
         }"
         :disabled="hasAnswered"
-        :key="`${question.kana}-${answer}`"
+        :key="`${question.answers}-${answer}`"
         @click="() => onAnswer(answer)"
         v-for="answer in question.answers"
       >
@@ -148,20 +65,17 @@ async function newQuestion() {
         Next
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-4 h-4"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          class="w-5 h-5"
         >
           <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+            fill-rule="evenodd"
+            d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z"
+            clip-rule="evenodd"
           />
         </svg>
       </button>
     </div>
   </div>
 </template>
-../utilities/analytics../utilities/constants

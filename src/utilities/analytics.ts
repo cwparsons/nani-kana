@@ -1,4 +1,4 @@
-import { MONOGRAPHS } from "./constants";
+import { HIRAGANA_MONOGRAPHS } from "./constants";
 
 const KEY = `analytics-v1`;
 
@@ -42,7 +42,7 @@ function setStatistics(statistics: Statistics) {
 function emptyStatistics() {
   const statistics: Statistics = {};
 
-  Object.keys(MONOGRAPHS).forEach(
+  Object.keys(HIRAGANA_MONOGRAPHS).forEach(
     (monograph) => (statistics[monograph] = { visible: 0, correct: 0 })
   );
 

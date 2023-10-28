@@ -1,4 +1,4 @@
-export const MONOGRAPHS: { [k: string]: string } = {
+export const HIRAGANA_MONOGRAPHS: { [k: string]: string } = {
   あ: "a",
   い: "i",
   う: "u",
@@ -46,3 +46,37 @@ export const MONOGRAPHS: { [k: string]: string } = {
   を: "wo",
   ん: "n",
 };
+
+export const HIRAGANA_DIACRITICS: { [k: string]: string } = {
+  が: 'ga',
+  ぎ: 'gi',
+  ぐ: 'gu',
+  げ: 'ge',
+  ご: 'go',
+  ざ: 'za',
+  じ: 'ji',
+  ず: 'zu',
+  ぜ: 'ze',
+  ぞ: 'zo',
+  だ: 'da',
+  ぢ: 'ji*',
+  づ: 'zu*',
+  で: 'de',
+  ど: 'do',
+  ば: 'ba',
+  び: 'bi',
+  ぶ: 'bu',
+  べ: 'be',
+  ぼ: 'bo',
+  ぱ: 'pa',
+  ぴ: 'pi',
+  ぷ: 'pu',
+  ぺ: 'pe',
+  ぽ: 'po',
+};
+
+// @todo
+export const HIRAGANA_DIGRAPHS: { [k: string]: string } = {};
+export const KATAKANA_MONOGRAPHS: { [k: string]: string } = {};
+export const KATAKANA_DIACRITICS: { [k: string]: string } = {};
+export const KATAKANA_DIGRAPHS: { [k: string]: string } = {};

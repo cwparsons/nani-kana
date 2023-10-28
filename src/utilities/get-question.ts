@@ -1,6 +1,6 @@
 import { useGameStore } from "../store/use-game-store";
 import { getStatistics } from "./analytics";
-import { MONOGRAPHS } from "./constants";
+import { getAllCharacters } from "./get-all-characters";
 
 type Question = {
   character: string;
@@ -12,6 +12,7 @@ type Question = {
  * Choose incorrect answers more often than normally correct answers.
  */
 function getLeastCorrectCharacter() {
+  const characters = getAllCharacters();
   const statistics = getStatistics();
   const options: number[] = [];
 
@@ -20,7 +21,7 @@ function getLeastCorrectCharacter() {
       4,
       statistics[statistic].visible - statistics[statistic].correct + 1
     );
-    const index = Object.keys(MONOGRAPHS).indexOf(statistic);
+    const index = Object.keys(characters).indexOf(statistic);
 
     for (let i = 0; i < items; i++) {
       options.push(index);
@@ -29,15 +30,17 @@ function getLeastCorrectCharacter() {
 
   const randomIndex = Math.floor(Math.random() * options.length);
 
-  return Object.keys(MONOGRAPHS)[randomIndex];
+  return Object.keys(characters)[randomIndex];
 }
 
 function getRandomCharacter() {
+  const characters = getAllCharacters();
+
   const randomIndex = Math.floor(
-    Math.random() * Object.keys(MONOGRAPHS).length
+    Math.random() * Object.keys(characters).length
   );
 
-  return Object.keys(MONOGRAPHS)[randomIndex];
+  return Object.keys(characters)[randomIndex];
 }
 
 function pickRandomCharacter() {
@@ -51,6 +54,7 @@ function pickRandomCharacter() {
 }
 
 export function getQuestion(previousQuestion?: Question): Question {
+  const characters = getAllCharacters();
   const gameStore = useGameStore();
 
   let randomCharacter = pickRandomCharacter();
@@ -66,10 +70,10 @@ export function getQuestion(previousQuestion?: Question): Question {
     }
   }
 
-  const answer = MONOGRAPHS[randomCharacter];
+  const answer = characters[randomCharacter];
 
   // Pick random answers that aren't the real answer
-  const shuffled = Object.values(MONOGRAPHS)
+  const shuffled = Object.values(characters)
     .filter((v) => v !== answer)
     .sort(() => 0.5 - Math.random());
 
@@ -79,11 +83,11 @@ export function getQuestion(previousQuestion?: Question): Question {
   const randomAnswerIndex = Math.floor(
     Math.random() * gameStore.numberOfAnswers
   );
-  answers[randomAnswerIndex] = MONOGRAPHS[randomCharacter];
+  answers[randomAnswerIndex] = characters[randomCharacter];
 
   answers.sort((a, b) => {
-    const indexA = Object.values(MONOGRAPHS).findIndex((v) => v === a);
-    const indexB = Object.values(MONOGRAPHS).findIndex((v) => v === b);
+    const indexA = Object.values(characters).findIndex((v) => v === a);
+    const indexB = Object.values(characters).findIndex((v) => v === b);
 
     return indexA < indexB ? -1 : 1;
   });

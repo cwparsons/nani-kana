@@ -14,19 +14,19 @@ type Question = {
 function getLeastCorrectCharacter() {
   const characters = getAllCharacters();
   const statistics = getStatistics();
-  const options: number[] = [];
 
-  for (const statistic in statistics) {
-    const items = Math.min(
-      4,
-      statistics[statistic].visible - statistics[statistic].correct + 1
-    );
-    const index = Object.keys(characters).indexOf(statistic);
+  // Get all the options and sort them by percentage
+  const allOptions = Object.keys(statistics)
+    .map((s) => ({
+      character: s,
+      percentage: statistics[s].correct / (statistics[s].visible ?? 1),
+    }))
+    .sort((a, b) => a.percentage - b.percentage);
 
-    for (let i = 0; i < items; i++) {
-      options.push(index);
-    }
-  }
+  const half = Math.ceil(allOptions.length / 2);
+
+  // Select the bottom half of options
+  const options = allOptions.slice(0, half);
 
   const randomIndex = Math.floor(Math.random() * options.length);
 

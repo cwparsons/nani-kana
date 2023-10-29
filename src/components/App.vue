@@ -18,7 +18,7 @@ gameStore.$subscribe((_mutation, state) => {
   <div class="flex flex-col items-center gap-y-4 min-h-screen w-full">
     <Header v-if="gameStore.screen !== 'Splash'" />
 
-    <main class="flex grow items-center justify-center w-96">
+    <main class="flex grow items-center justify-center p-4 w-96">
       <Options v-if="gameStore.screen === 'Options'" />
       <Question v-if="gameStore.screen === 'Question'" />
       <Splash v-if="gameStore.screen === 'Splash'" />

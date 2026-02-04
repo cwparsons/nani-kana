@@ -44,18 +44,19 @@ function loadStore(): Partial<GameStore> {
         ? { screen: parsed.screen as GameScreens }
         : {}),
       ...(typeof parsed.numberOfAnswers === "number" &&
-        parsed.numberOfAnswers >= 2 &&
-        parsed.numberOfAnswers <= 12
+      parsed.numberOfAnswers >= 2 &&
+      parsed.numberOfAnswers <= 12
         ? { numberOfAnswers: parsed.numberOfAnswers }
         : {}),
       ...(parsed.questionSelection === "random" ||
-        parsed.questionSelection === "least-correct"
+      parsed.questionSelection === "least-correct"
         ? { questionSelection: parsed.questionSelection }
         : {}),
       ...(typeof parsed.hiraganaMonographsEnabled === "boolean" && {
         hiraganaMonographsEnabled: parsed.hiraganaMonographsEnabled,
       }),
-      ...(typeof parsed.hiraganaMonographsWithDiacriticsEnabled === "boolean" && {
+      ...(typeof parsed.hiraganaMonographsWithDiacriticsEnabled ===
+        "boolean" && {
         hiraganaMonographsWithDiacriticsEnabled:
           parsed.hiraganaMonographsWithDiacriticsEnabled,
       }),
@@ -65,7 +66,8 @@ function loadStore(): Partial<GameStore> {
       ...(typeof parsed.katakanaMonographsEnabled === "boolean" && {
         katakanaMonographsEnabled: parsed.katakanaMonographsEnabled,
       }),
-      ...(typeof parsed.katakanaMonographsWithDiacriticsEnabled === "boolean" && {
+      ...(typeof parsed.katakanaMonographsWithDiacriticsEnabled ===
+        "boolean" && {
         katakanaMonographsWithDiacriticsEnabled:
           parsed.katakanaMonographsWithDiacriticsEnabled,
       }),

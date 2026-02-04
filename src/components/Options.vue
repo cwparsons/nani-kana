@@ -30,7 +30,11 @@ const gameStore = useGameStore();
       >
         Question selection:
       </label>
-      <select class="border p-2" id="question-selection" v-model="gameStore.questionSelection">
+      <select
+        class="border p-2"
+        id="question-selection"
+        v-model="gameStore.questionSelection"
+      >
         <option value="random">Random</option>
         <option value="least-correct">Incorrect more often</option>
       </select>
@@ -150,6 +154,8 @@ const gameStore = useGameStore();
       </div>
     </div>
 
-    <button @click="gameStore.screen = 'Splash'" type="button">Return home</button>
+    <button @click="gameStore.screen = 'Splash'" type="button">
+      Return home
+    </button>
   </form>
 </template>

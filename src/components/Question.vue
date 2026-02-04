@@ -1,13 +1,38 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { nextTick, onMounted, onUnmounted, ref } from "vue";
 
 import { recordAnswer } from "../utilities/analytics";
 import { getQuestion } from "../utilities/get-question";
 
-const hasAnswered = ref(false);
-const question = ref(getQuestion());
+const ANSWER_KEYS = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "0",
+  "-",
+  "+",
+];
 
-function onAnswer(answer: string) {
+const hasAnswered = ref(false);
+const nextButtonRef = ref<HTMLButtonElement | null>(null);
+const question = ref(getQuestion());
+const showShortcuts = ref(true);
+
+function updateShowShortcuts() {
+  showShortcuts.value = !window.matchMedia("(pointer: coarse)").matches;
+}
+
+function shortcutKey(index: number): string {
+  return ANSWER_KEYS[index] ?? "";
+}
+
+async function onAnswer(answer: string) {
   hasAnswered.value = true;
 
   const correct = answer === question.value.answer;
@@ -18,13 +43,34 @@ function onAnswer(answer: string) {
     window.navigator?.vibrate?.(200);
 
     newQuestion();
+  } else {
+    await nextTick();
+    nextButtonRef.value?.focus();
   }
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  if (hasAnswered.value) return;
+  const key = e.key;
+  const index = ANSWER_KEYS.indexOf(key);
+  if (index === -1 || index >= question.value.answers.length) return;
+  e.preventDefault();
+  onAnswer(question.value.answers[index]);
 }
 
 async function newQuestion() {
   question.value = getQuestion();
   hasAnswered.value = false;
 }
+
+onMounted(() => {
+  updateShowShortcuts();
+  const mql = window.matchMedia("(pointer: coarse)");
+  mql.addEventListener("change", updateShowShortcuts);
+  onUnmounted(() => mql.removeEventListener("change", updateShowShortcuts));
+  window.addEventListener("keydown", handleKeydown);
+});
+onUnmounted(() => window.removeEventListener("keydown", handleKeydown));
 </script>
 
 <template>
@@ -35,7 +81,7 @@ async function newQuestion() {
 
     <div class="grid grid-cols-2 gap-4">
       <button
-        class="rounded-lg"
+        class="relative rounded-lg"
         :class="{
           'bg-lime-900': hasAnswered && answer === question.answer,
           'bg-rose-950': hasAnswered && answer !== question.answer,
@@ -43,8 +89,15 @@ async function newQuestion() {
         :disabled="hasAnswered"
         :key="`${question.answers}-${answer}`"
         @click="() => onAnswer(answer)"
-        v-for="answer in question.answers"
+        v-for="(answer, index) in question.answers"
       >
+        <span
+          v-if="showShortcuts && shortcutKey(index)"
+          class="absolute left-1.5 top-1.5 text-xs opacity-60"
+          aria-hidden="true"
+        >
+          {{ shortcutKey(index) }}
+        </span>
         {{ answer }}
       </button>
     </div>
@@ -55,6 +108,7 @@ async function newQuestion() {
       :class="{ 'opacity-100': hasAnswered }"
     >
       <button
+        ref="nextButtonRef"
         class="flex rounded-lg items-center gap-x-2"
         @click="newQuestion"
         :disabled="!hasAnswered"

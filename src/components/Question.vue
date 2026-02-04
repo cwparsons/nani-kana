@@ -59,7 +59,8 @@ function handleKeydown(e: KeyboardEvent) {
 }
 
 async function newQuestion() {
-  question.value = getQuestion();
+  const previousQuestion = question.value;
+  question.value = getQuestion(previousQuestion);
   hasAnswered.value = false;
 }
 

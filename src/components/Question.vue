@@ -12,7 +12,7 @@ function onAnswer(answer: string) {
 
   const correct = answer === question.value.answer;
 
-  recordAnswer(question.value.answer, correct);
+  recordAnswer(question.value.character, correct);
 
   if (correct) {
     window.navigator?.vibrate?.(200);
@@ -29,11 +29,8 @@ async function newQuestion() {
 
 <template>
   <div class="flex flex-col gap-y-8">
-    <div>
-      <div class="flex"></div>
-      <div class="border border-solid border-neutral-500 p-8 rounded-lg">
-        <h2 class="text-9xl">{{ question.character }}</h2>
-      </div>
+    <div class="border border-solid border-neutral-500 p-8 rounded-lg">
+      <h2 class="text-9xl">{{ question.character }}</h2>
     </div>
 
     <div class="grid grid-cols-2 gap-4">

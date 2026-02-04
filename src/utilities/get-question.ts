@@ -11,45 +11,42 @@ type Question = {
 /**
  * Choose incorrect answers more often than normally correct answers.
  */
-function getLeastCorrectCharacter() {
+function getLeastCorrectCharacter(): string | undefined {
   const characters = getAllCharacters();
+  const characterKeys = Object.keys(characters);
+  if (characterKeys.length === 0) return undefined;
+
   const statistics = getStatistics();
 
-  // Get all the options and sort them by percentage
-  const allOptions = Object.keys(statistics)
-    .map((s) => ({
-      character: s,
-      percentage: statistics[s].correct / (statistics[s].visible ?? 1),
+  const allOptions = characterKeys
+    .filter((k) => statistics[k] != null)
+    .map((k) => ({
+      character: k,
+      percentage:
+        statistics[k].correct / (statistics[k].visible || 1),
     }))
     .sort((a, b) => a.percentage - b.percentage);
 
+  if (allOptions.length === 0) return getRandomCharacter();
+
   const half = Math.ceil(allOptions.length / 2);
-
-  // Select the bottom half of options
   const options = allOptions.slice(0, half);
-
   const randomIndex = Math.floor(Math.random() * options.length);
-
-  return Object.keys(characters)[randomIndex];
+  return options[randomIndex].character;
 }
 
-function getRandomCharacter() {
+function getRandomCharacter(): string | undefined {
   const characters = getAllCharacters();
-
-  const randomIndex = Math.floor(
-    Math.random() * Object.keys(characters).length
-  );
-
-  return Object.keys(characters)[randomIndex];
+  const keys = Object.keys(characters);
+  if (keys.length === 0) return undefined;
+  return keys[Math.floor(Math.random() * keys.length)];
 }
 
-function pickRandomCharacter() {
+function pickRandomCharacter(): string | undefined {
   const gameStore = useGameStore();
-
   if (gameStore.questionSelection === "least-correct") {
-    return getLeastCorrectCharacter();
+    return getLeastCorrectCharacter() ?? getRandomCharacter();
   }
-
   return getRandomCharacter();
 }
 
@@ -58,16 +55,16 @@ export function getQuestion(previousQuestion?: Question): Question {
   const gameStore = useGameStore();
 
   let randomCharacter = pickRandomCharacter();
+  if (randomCharacter == null) {
+    throw new Error("No characters enabled. Enable at least one kana set in Options.");
+  }
 
-  // If it was the last question, pick another random index.
   if (previousQuestion) {
-    for (
-      let i = 0;
-      i < 1e3 && previousQuestion.character === randomCharacter;
-      i++
-    ) {
+    for (let i = 0; i < 1e3 && previousQuestion.character === randomCharacter; i++) {
       randomCharacter = pickRandomCharacter();
+      if (randomCharacter == null) break;
     }
+    if (randomCharacter == null) randomCharacter = Object.keys(characters)[0];
   }
 
   const answer = characters[randomCharacter];

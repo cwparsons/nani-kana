@@ -11,8 +11,7 @@ type Question = {
 /**
  * Choose incorrect answers more often than normally correct answers.
  */
-function getLeastCorrectCharacter(): string | undefined {
-  const characters = getAllCharacters();
+function getLeastCorrectCharacter(characters: Record<string, string>): string | undefined {
   const characterKeys = Object.keys(characters);
   if (characterKeys.length === 0) return undefined;
 
@@ -27,7 +26,7 @@ function getLeastCorrectCharacter(): string | undefined {
     }))
     .sort((a, b) => a.percentage - b.percentage);
 
-  if (allOptions.length === 0) return getRandomCharacter();
+  if (allOptions.length === 0) return getRandomCharacter(characters);
 
   const half = Math.ceil(allOptions.length / 2);
   const options = allOptions.slice(0, half);
@@ -35,8 +34,7 @@ function getLeastCorrectCharacter(): string | undefined {
   return options[randomIndex].character;
 }
 
-function getRandomCharacter(): string | undefined {
-  const characters = getAllCharacters();
+function getRandomCharacter(characters: Record<string, string>): string | undefined {
   const keys = Object.keys(characters);
   if (keys.length === 0) return undefined;
   return keys[Math.floor(Math.random() * keys.length)];
@@ -55,8 +53,7 @@ function shuffle<T>(array: T[]): T[] {
  * Pick a random character from the enabled set; each character is shown
  * once before any repeat. After a full cycle the order is reshuffled.
  */
-function getSequentialCharacter(): string | undefined {
-  const characters = getAllCharacters();
+function getSequentialCharacter(characters: Record<string, string>): string | undefined {
   const keys = Object.keys(characters);
   if (keys.length === 0) return undefined;
 
@@ -71,29 +68,29 @@ function getSequentialCharacter(): string | undefined {
   return character;
 }
 
-function pickRandomCharacter(): string | undefined {
+function pickRandomCharacter(characters: Record<string, string>): string | undefined {
   const gameStore = useGameStore();
   if (gameStore.questionSelection === "sequential") {
-    return getSequentialCharacter() ?? getRandomCharacter();
+    return getSequentialCharacter(characters) ?? getRandomCharacter(characters);
   }
   if (gameStore.questionSelection === "least-correct") {
-    return getLeastCorrectCharacter() ?? getRandomCharacter();
+    return getLeastCorrectCharacter(characters) ?? getRandomCharacter(characters);
   }
-  return getRandomCharacter();
+  return getRandomCharacter(characters);
 }
 
 export function getQuestion(previousQuestion?: Question): Question {
   const characters = getAllCharacters();
   const gameStore = useGameStore();
 
-  let randomCharacter = pickRandomCharacter();
+  let randomCharacter = pickRandomCharacter(characters);
   if (randomCharacter == null) {
     throw new Error("No characters enabled. Enable at least one kana set in Options.");
   }
 
   if (previousQuestion) {
     for (let i = 0; i < 1e3 && previousQuestion.character === randomCharacter; i++) {
-      randomCharacter = pickRandomCharacter();
+      randomCharacter = pickRandomCharacter(characters);
       if (randomCharacter == null) break;
     }
     if (randomCharacter == null) randomCharacter = Object.keys(characters)[0];
@@ -101,25 +98,20 @@ export function getQuestion(previousQuestion?: Question): Question {
 
   const answer = characters[randomCharacter];
 
-  // Pick random answers that aren't the real answer
-  const shuffled = Object.values(characters)
-    .filter((v) => v !== answer)
-    .sort(() => 0.5 - Math.random());
+  // Pick random wrong answers using Fisher–Yates shuffle (unbiased)
+  const wrongRomaji = Object.values(characters).filter((v) => v !== answer);
+  const shuffledWrong = shuffle(wrongRomaji);
+  const answers = [...shuffledWrong.slice(0, gameStore.numberOfAnswers)];
 
-  const answers = [...shuffled.slice(0, gameStore.numberOfAnswers)];
-
-  // Random insert real answer into randomized answers
-  const randomAnswerIndex = Math.floor(
-    Math.random() * gameStore.numberOfAnswers
-  );
+  // Random insert real answer
+  const randomAnswerIndex = Math.floor(Math.random() * gameStore.numberOfAnswers);
   answers[randomAnswerIndex] = characters[randomCharacter];
 
-  answers.sort((a, b) => {
-    const indexA = Object.values(characters).findIndex((v) => v === a);
-    const indexB = Object.values(characters).findIndex((v) => v === b);
-
-    return indexA < indexB ? -1 : 1;
-  });
+  // Sort answers by romaji order for consistent display
+  const romajiToIndex = new Map<string, number>(
+    Object.values(characters).map((romaji, i) => [romaji, i])
+  );
+  answers.sort((a, b) => (romajiToIndex.get(a) ?? 0) - (romajiToIndex.get(b) ?? 0));
 
   return { character: randomCharacter, answer, answers };
 }

@@ -16,6 +16,8 @@ type Statistics = {
   };
 };
 
+let statisticsCache: Statistics | null = null;
+
 /** Romaji → kana (for migrating stats that were stored with English keys). */
 function romajiToKana(): Record<string, string> {
   const out: Record<string, string> = {};
@@ -64,21 +66,32 @@ export function recordAnswer(kana: string, correct: boolean) {
     statistics[kana].correct++;
   }
 
+  statisticsCache = statistics;
   setStatistics(statistics);
 }
 
 export function getStatistics(): Statistics {
-  const raw = window.localStorage.getItem(KEY) ?? JSON.stringify(emptyStatistics());
+  if (statisticsCache != null) return statisticsCache;
+
+  const raw =
+    window.localStorage.getItem(KEY) ?? JSON.stringify(emptyStatistics());
   const statistics = JSON.parse(raw) as Statistics;
   const migrated = migrateRomajiKeysToKana(statistics);
+
   if (migrated !== statistics) {
     setStatistics(migrated);
+    statisticsCache = migrated;
+
     return migrated;
   }
+
+  statisticsCache = statistics;
+
   return statistics;
 }
 
 export function resetStatistics() {
+  statisticsCache = null;
   setStatistics(emptyStatistics());
 }
 
@@ -92,7 +105,7 @@ function emptyStatistics() {
   const statistics: Statistics = {};
 
   Object.keys(HIRAGANA_MONOGRAPHS).forEach(
-    (monograph) => (statistics[monograph] = { visible: 0, correct: 0 })
+    (monograph) => (statistics[monograph] = { visible: 0, correct: 0 }),
   );
 
   return statistics;

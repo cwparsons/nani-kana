@@ -64,14 +64,19 @@ async function newQuestion() {
   hasAnswered.value = false;
 }
 
+const mql =
+  typeof window !== "undefined" ? window.matchMedia("(pointer: coarse)") : null;
+
 onMounted(() => {
   updateShowShortcuts();
-  const mql = window.matchMedia("(pointer: coarse)");
-  mql.addEventListener("change", updateShowShortcuts);
-  onUnmounted(() => mql.removeEventListener("change", updateShowShortcuts));
+  mql?.addEventListener("change", updateShowShortcuts);
   window.addEventListener("keydown", handleKeydown);
 });
-onUnmounted(() => window.removeEventListener("keydown", handleKeydown));
+
+onUnmounted(() => {
+  mql?.removeEventListener("change", updateShowShortcuts);
+  window.removeEventListener("keydown", handleKeydown);
+});
 </script>
 
 <template>
@@ -88,7 +93,7 @@ onUnmounted(() => window.removeEventListener("keydown", handleKeydown));
           'bg-rose-950': hasAnswered && answer !== question.answer,
         }"
         :disabled="hasAnswered"
-        :key="`${question.answers}-${answer}`"
+        :key="`${question.character}-${index}-${answer}`"
         @click="() => onAnswer(answer)"
         v-for="(answer, index) in question.answers"
       >
@@ -117,13 +122,13 @@ onUnmounted(() => window.removeEventListener("keydown", handleKeydown));
         Next
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
           fill="currentColor"
           class="w-5 h-5"
+          viewBox="0 0 20 20"
         >
           <path
             fill-rule="evenodd"
-            d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z"
+            d="M3 10a1 1 0 0 1 .8-.7h10.6l-4.2-4a.8.8 0 1 1 1-1l5.6 5.2a1 1 0 0 1 0 1l-5.5 5.3a.8.8 0 1 1-1-1l4-4H3.9A1 1 0 0 1 3 10"
             clip-rule="evenodd"
           />
         </svg>

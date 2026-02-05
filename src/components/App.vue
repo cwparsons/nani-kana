@@ -9,9 +9,25 @@ import { GAME_STORE_KEY, useGameStore } from "../store/use-game-store";
 
 const gameStore = useGameStore();
 
+let persistTimeout: ReturnType<typeof setTimeout> | null = null;
 gameStore.$subscribe((_mutation, state) => {
-  localStorage.setItem(GAME_STORE_KEY, JSON.stringify(state));
+  if (persistTimeout != null) clearTimeout(persistTimeout);
+  persistTimeout = setTimeout(() => {
+    persistTimeout = null;
+    localStorage.setItem(GAME_STORE_KEY, JSON.stringify(state));
+  }, 300);
 });
+
+// Flush on page unload so last state is saved
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeunload", () => {
+    if (persistTimeout != null) {
+      clearTimeout(persistTimeout);
+      persistTimeout = null;
+      localStorage.setItem(GAME_STORE_KEY, JSON.stringify(gameStore.$state));
+    }
+  });
+}
 </script>
 
 <template>

@@ -55,7 +55,6 @@ const gameStore = useGameStore();
           <input
             class="h-6 w-6 border p-2 text-center cursor-pointer"
             id="hiragana-monographs"
-            max="12"
             name="hiragana-monographs"
             type="checkbox"
             v-model="gameStore.hiraganaMonographsEnabled"
@@ -72,7 +71,6 @@ const gameStore = useGameStore();
           <input
             class="h-6 w-6 border p-2 text-center cursor-pointer"
             id="hiragana-monographs-with-diacritics"
-            max="12"
             name="hiragana-monographs-with-diacritics"
             type="checkbox"
             v-model="gameStore.hiraganaMonographsWithDiacriticsEnabled"
@@ -89,7 +87,6 @@ const gameStore = useGameStore();
           <input
             class="h-6 w-6 border p-2 text-center cursor-pointer"
             id="hiragana-monographs-with-diagraphs"
-            max="12"
             name="hiragana-monographs-with-diagraphs"
             type="checkbox"
             v-model="gameStore.hiraganaWithDigraphsEnabled"
@@ -112,7 +109,6 @@ const gameStore = useGameStore();
           <input
             class="h-6 w-6 border p-2 text-center cursor-pointer"
             id="katakana-monographs"
-            max="12"
             name="katakana-monographs"
             type="checkbox"
             v-model="gameStore.katakanaMonographsEnabled"
@@ -129,7 +125,6 @@ const gameStore = useGameStore();
           <input
             class="h-6 w-6 border p-2 text-center cursor-pointer"
             id="katakana-monographs-with-diacritics"
-            max="12"
             name="katakana-monographs-with-diacritics"
             type="checkbox"
             v-model="gameStore.katakanaMonographsWithDiacriticsEnabled"
@@ -146,7 +141,6 @@ const gameStore = useGameStore();
           <input
             class="h-6 w-6 border p-2 text-center cursor-pointer"
             id="katakana-monographs-with-diagraphs"
-            max="12"
             name="katakana-monographs-with-diagraphs"
             type="checkbox"
             v-model="gameStore.katakanaWithDigraphsEnabled"

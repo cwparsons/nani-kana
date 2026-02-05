@@ -1,3 +1,5 @@
+import { ref } from "vue";
+
 import {
   HIRAGANA_DIACRITICS,
   HIRAGANA_DIGRAPHS,
@@ -9,14 +11,25 @@ import {
 
 const KEY = `analytics-v1`;
 
-type Statistics = {
+export type Statistics = {
   [k: string]: {
     visible: number;
     correct: number;
   };
 };
 
-let statisticsCache: Statistics | null = null;
+/** Reactive source of truth for statistics; components use this so the UI updates when stats change. */
+export const statisticsRef = ref<Statistics | null>(null);
+
+function ensureHydrated(): void {
+  if (statisticsRef.value !== null) return;
+  const raw =
+    window.localStorage.getItem(KEY) ?? JSON.stringify(emptyStatistics());
+  const statistics = JSON.parse(raw) as Statistics;
+  const migrated = migrateRomajiKeysToKana(statistics);
+  if (migrated !== statistics) setStatistics(migrated);
+  statisticsRef.value = migrated;
+}
 
 /** Romaji → kana (for migrating stats that were stored with English keys). */
 function romajiToKana(): Record<string, string> {
@@ -56,43 +69,22 @@ function migrateRomajiKeysToKana(statistics: Statistics): Statistics {
 }
 
 export function recordAnswer(kana: string, correct: boolean) {
-  const statistics = getStatistics();
-
+  ensureHydrated();
+  const statistics = statisticsRef.value!;
   statistics[kana] = statistics[kana] ?? { visible: 0, correct: 0 };
-
   statistics[kana].visible++;
-
-  if (correct) {
-    statistics[kana].correct++;
-  }
-
-  statisticsCache = statistics;
+  if (correct) statistics[kana].correct++;
   setStatistics(statistics);
 }
 
 export function getStatistics(): Statistics {
-  if (statisticsCache != null) return statisticsCache;
-
-  const raw =
-    window.localStorage.getItem(KEY) ?? JSON.stringify(emptyStatistics());
-  const statistics = JSON.parse(raw) as Statistics;
-  const migrated = migrateRomajiKeysToKana(statistics);
-
-  if (migrated !== statistics) {
-    setStatistics(migrated);
-    statisticsCache = migrated;
-
-    return migrated;
-  }
-
-  statisticsCache = statistics;
-
-  return statistics;
+  ensureHydrated();
+  return statisticsRef.value!;
 }
 
 export function resetStatistics() {
-  statisticsCache = null;
-  setStatistics(emptyStatistics());
+  statisticsRef.value = emptyStatistics();
+  setStatistics(statisticsRef.value);
 }
 
 function setStatistics(statistics: Statistics) {

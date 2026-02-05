@@ -5,7 +5,9 @@ type GameScreens = "Splash" | "Question" | "Options" | "Statistics";
 type GameStore = {
   screen: GameScreens;
   numberOfAnswers: number;
-  questionSelection: "random" | "least-correct";
+  questionSelection: "random" | "least-correct" | "sequential";
+  /** Characters not yet shown this cycle; when empty we reshuffle and start over. */
+  sequentialRemainingCharacters: string[];
 
   // Hiragana
   hiraganaMonographsEnabled: boolean;
@@ -24,6 +26,7 @@ const DEFAULT_STORE: GameStore = {
   screen: "Splash",
   numberOfAnswers: 8,
   questionSelection: "random",
+  sequentialRemainingCharacters: [],
   hiraganaMonographsEnabled: true,
   hiraganaMonographsWithDiacriticsEnabled: false,
   hiraganaWithDigraphsEnabled: false,
@@ -49,8 +52,13 @@ function loadStore(): Partial<GameStore> {
         ? { numberOfAnswers: parsed.numberOfAnswers }
         : {}),
       ...(parsed.questionSelection === "random" ||
-      parsed.questionSelection === "least-correct"
+      parsed.questionSelection === "least-correct" ||
+      parsed.questionSelection === "sequential"
         ? { questionSelection: parsed.questionSelection }
+        : {}),
+      ...(Array.isArray(parsed.sequentialRemainingCharacters) &&
+      parsed.sequentialRemainingCharacters.every((x: unknown) => typeof x === "string")
+        ? { sequentialRemainingCharacters: parsed.sequentialRemainingCharacters as string[] }
         : {}),
       ...(typeof parsed.hiraganaMonographsEnabled === "boolean" && {
         hiraganaMonographsEnabled: parsed.hiraganaMonographsEnabled,

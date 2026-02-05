@@ -37,6 +37,7 @@ const gameStore = useGameStore();
       >
         <option value="random">Random</option>
         <option value="least-correct">Incorrect more often</option>
+        <option value="sequential">Every character before repeat</option>
       </select>
     </div>
 

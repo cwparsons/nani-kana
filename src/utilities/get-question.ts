@@ -42,8 +42,40 @@ function getRandomCharacter(): string | undefined {
   return keys[Math.floor(Math.random() * keys.length)];
 }
 
+function shuffle<T>(array: T[]): T[] {
+  const out = [...array];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+/**
+ * Pick a random character from the enabled set; each character is shown
+ * once before any repeat. After a full cycle the order is reshuffled.
+ */
+function getSequentialCharacter(): string | undefined {
+  const characters = getAllCharacters();
+  const keys = Object.keys(characters);
+  if (keys.length === 0) return undefined;
+
+  const gameStore = useGameStore();
+  let pool = gameStore.sequentialRemainingCharacters.filter((c) => c in characters);
+  if (pool.length === 0) pool = shuffle(keys);
+
+  const index = Math.floor(Math.random() * pool.length);
+  const character = pool[index];
+  pool.splice(index, 1);
+  gameStore.sequentialRemainingCharacters = pool;
+  return character;
+}
+
 function pickRandomCharacter(): string | undefined {
   const gameStore = useGameStore();
+  if (gameStore.questionSelection === "sequential") {
+    return getSequentialCharacter() ?? getRandomCharacter();
+  }
   if (gameStore.questionSelection === "least-correct") {
     return getLeastCorrectCharacter() ?? getRandomCharacter();
   }

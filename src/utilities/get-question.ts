@@ -2,8 +2,12 @@ import { useGameStore } from "../store/use-game-store";
 import { getStatistics } from "./analytics";
 import { getAllCharacters } from "./get-all-characters";
 
-type Question = {
+export type QuizDirection = "kana-to-romaji" | "romaji-to-kana";
+
+export type Question = {
   character: string;
+  romaji: string;
+  direction: QuizDirection;
   answer: string;
   answers: string[];
 };
@@ -79,9 +83,24 @@ function pickRandomCharacter(characters: Record<string, string>): string | undef
   return getRandomCharacter(characters);
 }
 
+function pickDirection(): QuizDirection {
+  const gameStore = useGameStore();
+  const forward = gameStore.kanaToRomajiEnabled;
+  const reverse = gameStore.romajiToKanaEnabled;
+  if (forward && reverse) return Math.random() < 0.5 ? "kana-to-romaji" : "romaji-to-kana";
+  if (reverse) return "romaji-to-kana";
+  return "kana-to-romaji";
+}
+
 export function getQuestion(previousQuestion?: Question): Question {
   const characters = getAllCharacters();
   const gameStore = useGameStore();
+
+  const kanaToRomaji = gameStore.kanaToRomajiEnabled;
+  const romajiToKana = gameStore.romajiToKanaEnabled;
+  if (!kanaToRomaji && !romajiToKana) {
+    throw new Error("Enable at least one quiz direction (Kana → Romaji or Romaji → Kana) in Options.");
+  }
 
   let randomCharacter = pickRandomCharacter(characters);
   if (randomCharacter == null) {
@@ -96,22 +115,31 @@ export function getQuestion(previousQuestion?: Question): Question {
     if (randomCharacter == null) randomCharacter = Object.keys(characters)[0];
   }
 
-  const answer = characters[randomCharacter];
+  const romaji = characters[randomCharacter];
+  const direction = pickDirection();
 
-  // Pick random wrong answers using Fisher–Yates shuffle (unbiased)
-  const wrongRomaji = Object.values(characters).filter((v) => v !== answer);
-  const shuffledWrong = shuffle(wrongRomaji);
-  const answers = [...shuffledWrong.slice(0, gameStore.numberOfAnswers)];
+  if (direction === "kana-to-romaji") {
+    const answer = romaji;
+    const wrongRomaji = Object.values(characters).filter((v) => v !== answer);
+    const shuffledWrong = shuffle(wrongRomaji);
+    const answers = [...shuffledWrong.slice(0, gameStore.numberOfAnswers - 1)];
+    const randomAnswerIndex = Math.floor(Math.random() * gameStore.numberOfAnswers);
+    answers.splice(randomAnswerIndex, 0, answer);
+    return { character: randomCharacter, romaji, direction, answer, answers };
+  }
 
-  // Random insert real answer
+  // romaji-to-kana: prompt = romaji, answer = kana, options = kana
+  const characterKeys = Object.keys(characters);
+  const wrongKana = characterKeys.filter((k) => k !== randomCharacter);
+  const shuffledWrong = shuffle(wrongKana);
+  const answers = [...shuffledWrong.slice(0, gameStore.numberOfAnswers - 1)];
   const randomAnswerIndex = Math.floor(Math.random() * gameStore.numberOfAnswers);
-  answers[randomAnswerIndex] = characters[randomCharacter];
-
-  // Sort answers by romaji order for consistent display
-  const romajiToIndex = new Map<string, number>(
-    Object.values(characters).map((romaji, i) => [romaji, i])
-  );
-  answers.sort((a, b) => (romajiToIndex.get(a) ?? 0) - (romajiToIndex.get(b) ?? 0));
-
-  return { character: randomCharacter, answer, answers };
+  answers.splice(randomAnswerIndex, 0, randomCharacter);
+  return {
+    character: randomCharacter,
+    romaji,
+    direction: "romaji-to-kana",
+    answer: randomCharacter,
+    answers,
+  };
 }

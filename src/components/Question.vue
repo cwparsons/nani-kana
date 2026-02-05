@@ -80,20 +80,37 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-y-8">
-    <div class="border border-solid border-neutral-500 p-8 rounded-lg">
-      <h2 class="text-9xl">{{ question.character }}</h2>
+  <div class="flex w-full min-w-full max-w-full flex-col gap-y-8">
+    <div
+      class="flex min-h-52 w-full min-w-full max-w-full items-center justify-center rounded-lg border border-solid border-neutral-500 p-8"
+    >
+      <h2
+        class="text-center"
+        :class="{
+          'text-5xl': question.direction === 'romaji-to-kana',
+          'text-9xl': question.direction === 'kana-to-romaji',
+        }"
+      >
+        {{
+          question.direction === "kana-to-romaji"
+            ? question.character
+            : question.romaji
+        }}
+      </h2>
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
+    <div
+      class="grid w-full min-w-full max-w-full grid-cols-2 gap-4"
+      style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);"
+    >
       <button
-        class="relative rounded-lg"
+        class="relative flex min-h-24 min-w-0 items-center justify-center overflow-hidden rounded-lg text-4xl"
         :class="{
           'bg-lime-900': hasAnswered && answer === question.answer,
           'bg-rose-950': hasAnswered && answer !== question.answer,
         }"
         :disabled="hasAnswered"
-        :key="`${question.character}-${index}-${answer}`"
+        :key="`${question.character}-${question.direction}-${index}-${answer}`"
         @click="() => onAnswer(answer)"
         v-for="(answer, index) in question.answers"
       >

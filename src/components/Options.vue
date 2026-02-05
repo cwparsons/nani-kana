@@ -42,6 +42,31 @@ const gameStore = useGameStore();
     </div>
 
     <div class="grid">
+      <h2 class="mb-0">Quiz direction</h2>
+      <p class="text-sm opacity-80 mt-0 mb-2">
+        Enable both for a mix of question types each round.
+      </p>
+      <div class="flex flex-wrap gap-6">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input
+            class="h-6 w-6 border p-2 cursor-pointer"
+            type="checkbox"
+            v-model="gameStore.kanaToRomajiEnabled"
+          />
+          <span>Kana → Romaji</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input
+            class="h-6 w-6 border p-2 cursor-pointer"
+            type="checkbox"
+            v-model="gameStore.romajiToKanaEnabled"
+          />
+          <span>Romaji → Kana</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="grid">
       <h2 class="mb-0">Hiragana</h2>
 
       <div class="grid grid-cols-3">

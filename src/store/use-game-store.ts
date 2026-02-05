@@ -9,6 +9,10 @@ type GameStore = {
   /** Characters not yet shown this cycle; when empty we reshuffle and start over. */
   sequentialRemainingCharacters: string[];
 
+  // Quiz direction (at least one should be true; both = random per question)
+  kanaToRomajiEnabled: boolean;
+  romajiToKanaEnabled: boolean;
+
   // Hiragana
   hiraganaMonographsEnabled: boolean;
   hiraganaMonographsWithDiacriticsEnabled: boolean;
@@ -27,6 +31,8 @@ const DEFAULT_STORE: GameStore = {
   numberOfAnswers: 8,
   questionSelection: "random",
   sequentialRemainingCharacters: [],
+  kanaToRomajiEnabled: true,
+  romajiToKanaEnabled: false,
   hiraganaMonographsEnabled: true,
   hiraganaMonographsWithDiacriticsEnabled: false,
   hiraganaWithDigraphsEnabled: false,
@@ -60,6 +66,12 @@ function loadStore(): Partial<GameStore> {
       parsed.sequentialRemainingCharacters.every((x: unknown) => typeof x === "string")
         ? { sequentialRemainingCharacters: parsed.sequentialRemainingCharacters as string[] }
         : {}),
+      ...(typeof parsed.kanaToRomajiEnabled === "boolean" && {
+        kanaToRomajiEnabled: parsed.kanaToRomajiEnabled,
+      }),
+      ...(typeof parsed.romajiToKanaEnabled === "boolean" && {
+        romajiToKanaEnabled: parsed.romajiToKanaEnabled,
+      }),
       ...(typeof parsed.hiraganaMonographsEnabled === "boolean" && {
         hiraganaMonographsEnabled: parsed.hiraganaMonographsEnabled,
       }),

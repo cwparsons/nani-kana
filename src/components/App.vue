@@ -34,11 +34,13 @@ if (typeof window !== "undefined") {
   <div class="flex h-full min-h-0 flex-col items-center gap-y-4 w-full">
     <Header v-if="gameStore.screen !== 'Splash'" />
 
-    <main class="flex min-h-0 grow flex-col overflow-y-auto p-4 w-96">
-      <div class="flex min-h-full flex-col items-center justify-center w-full">
-        <Options v-if="gameStore.screen === 'Options'" />
-        <Question v-if="gameStore.screen === 'Question'" />
+    <main class="min-h-0 grow overflow-y-auto w-full">
+      <div
+        class="flex min-h-full flex-col items-center justify-center-safe w-80 p-4 mx-auto"
+      >
         <Splash v-if="gameStore.screen === 'Splash'" />
+        <Question v-if="gameStore.screen === 'Question'" />
+        <Options v-if="gameStore.screen === 'Options'" />
         <Statistics v-if="gameStore.screen === 'Statistics'" />
       </div>
     </main>

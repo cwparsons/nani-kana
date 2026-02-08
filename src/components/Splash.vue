@@ -6,7 +6,7 @@ const gameStore = useGameStore();
 
 <template>
   <div class="flex flex-col gap-y-8 justify-center">
-    <h1 class="text-8xl">
+    <h1 class="text-7xl">
       <ruby>
         何 <rp>(</rp><rt>Nani</rt><rp>)</rp> か <rp>(</rp><rt>ka</rt
         ><rp>)</rp> な <rp>(</rp><rt>na</rt><rp>)</rp>

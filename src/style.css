@@ -40,6 +40,10 @@
     overflow: hidden;
   }
 
+  #app {
+    height: 100%;
+  }
+
   button,
   button[type="button"] {
     @apply bg-stone-700 hover:bg-stone-600 active:bg-stone-800 rounded-lg;

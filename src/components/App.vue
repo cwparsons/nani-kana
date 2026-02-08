@@ -31,14 +31,16 @@ if (typeof window !== "undefined") {
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-y-4 min-h-screen w-full">
+  <div class="flex h-full min-h-0 flex-col items-center gap-y-4 w-full">
     <Header v-if="gameStore.screen !== 'Splash'" />
 
-    <main class="flex grow items-center justify-center p-4 w-96">
-      <Options v-if="gameStore.screen === 'Options'" />
-      <Question v-if="gameStore.screen === 'Question'" />
-      <Splash v-if="gameStore.screen === 'Splash'" />
-      <Statistics v-if="gameStore.screen === 'Statistics'" />
+    <main class="flex min-h-0 grow flex-col overflow-y-auto p-4 w-96">
+      <div class="flex min-h-full flex-col items-center justify-center w-full">
+        <Options v-if="gameStore.screen === 'Options'" />
+        <Question v-if="gameStore.screen === 'Question'" />
+        <Splash v-if="gameStore.screen === 'Splash'" />
+        <Statistics v-if="gameStore.screen === 'Statistics'" />
+      </div>
     </main>
   </div>
 </template>
